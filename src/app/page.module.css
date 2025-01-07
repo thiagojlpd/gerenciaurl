@@ -1,168 +1,182 @@
-.page {
-  --gray-rgb: 0, 0, 0;
-  --gray-alpha-200: rgba(var(--gray-rgb), 0.08);
-  --gray-alpha-100: rgba(var(--gray-rgb), 0.05);
+/* HomePage.css */
 
-  --button-primary-hover: #383838;
-  --button-secondary-hover: #f2f2f2;
-
-  display: grid;
-  grid-template-rows: 20px 1fr 20px;
-  align-items: center;
-  justify-items: center;
-  min-height: 100svh;
-  padding: 80px;
-  gap: 64px;
-  font-family: var(--font-geist-sans);
+/* Estilo geral do corpo da página */
+.body {
+  font-family: Arial, sans-serif; /* Define a fonte padrão como Arial */
+  background-color: #f4f4f9; /* Cor de fundo suave e clara */
+  color: #333; /* Cor de texto escura para boa legibilidade */
+  margin: 0; /* Remove a margem padrão do navegador */
+  padding: 0; /* Remove o padding padrão do navegador */
 }
 
-@media (prefers-color-scheme: dark) {
-  .page {
-    --gray-rgb: 255, 255, 255;
-    --gray-alpha-200: rgba(var(--gray-rgb), 0.145);
-    --gray-alpha-100: rgba(var(--gray-rgb), 0.06);
-
-    --button-primary-hover: #ccc;
-    --button-secondary-hover: #1a1a1a;
-  }
+/* Contêiner central que contém o conteúdo principal */
+.container {
+  width: 90%; /* Define a largura da container como 90% da tela */
+  max-width: 900px; /* Limita a largura máxima da container a 900px */
+  margin: 0 auto; /* Centraliza a container horizontalmente */
+  padding: 20px; /* Adiciona 20px de padding ao redor do conteúdo */
+  background-color: white; /* Define o fundo da container como branco */
+  border-radius: 8px; /* Bordas arredondadas para suavizar o visual */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Aplica uma leve sombra para dar profundidade */
 }
 
-.main {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-  grid-row-start: 2;
+/* Estilo para o título principal da página */
+.h1 {
+  color: #4A90E2; /* Cor azul vibrante para o título */
+  text-align: center; /* Centraliza o título */
+  font-size: 2rem; /* Tamanho da fonte maior para destaque */
+  margin-bottom: 20px; /* Espaço abaixo do título */
 }
 
-.main ol {
-  font-family: var(--font-geist-mono);
-  padding-left: 0;
-  margin: 0;
-  font-size: 14px;
-  line-height: 24px;
-  letter-spacing: -0.01em;
-  list-style-position: inside;
+/* Estilo para o subtítulo */
+.h2 {
+  color: #333; /* Cor de texto escura para o subtítulo */
+  font-size: 1.5rem; /* Tamanho de fonte intermediário para o subtítulo */
+  margin-bottom: 10px; /* Espaço abaixo do subtítulo */
 }
 
-.main li:not(:last-of-type) {
-  margin-bottom: 8px;
+/* Estilo para o formulário de entrada de dados */
+.form {
+  display: flex; /* Usa flexbox para o layout do formulário */
+  flex-direction: column; /* Organiza os elementos do formulário em uma coluna */
+  gap: 15px; /* Espaçamento entre os elementos */
+  margin-bottom: 20px; /* Espaço abaixo do formulário */
+  padding: 20px; /* Adiciona padding dentro do formulário */
+  border: 2px solid #4A90E2; /* Aplica uma borda azul ao redor do formulário */
+  border-radius: 8px; /* Bordas arredondadas */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para dar profundidade */
+  background-color: #fff; /* Fundo branco */
 }
 
-.main code {
-  font-family: inherit;
-  background: var(--gray-alpha-100);
-  padding: 2px 4px;
-  border-radius: 4px;
-  font-weight: 600;
+/* Estilo para cada grupo de campos dentro do formulário */
+.form-group {
+  display: flex; /* Usa flexbox para organizar os campos */
+  flex-direction: column; /* Organiza os itens em uma coluna */
 }
 
-.ctas {
-  display: flex;
-  gap: 16px;
+/* Estilo para os rótulos de cada campo no formulário */
+.label {
+  font-weight: bold; /* Torna o texto em negrito */
+  color: #4A90E2; /* Cor azul para os rótulos */
 }
 
-.ctas a {
-  appearance: none;
-  border-radius: 128px;
-  height: 48px;
-  padding: 0 20px;
-  border: none;
-  border: 1px solid transparent;
-  transition:
-    background 0.2s,
-    color 0.2s,
-    border-color 0.2s;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  line-height: 20px;
-  font-weight: 500;
+/* Estilo para os campos de entrada de dados */
+.input-field {
+  padding: 10px; /* Padding interno de 10px */
+  border: 1px solid #ccc; /* Borda cinza clara */
+  border-radius: 4px; /* Bordas arredondadas */
+  font-size: 1rem; /* Tamanho da fonte do campo */
+  width: 100%; /* Campo ocupa toda a largura disponível */
+  max-width: 400px; /* Limita a largura máxima do campo */
+  margin-top: 5px; /* Adiciona um pequeno espaçamento no topo */
 }
 
-a.primary {
-  background: var(--foreground);
-  color: var(--background);
-  gap: 8px;
+/* Estilo para o botão de envio */
+.submit-btn {
+  background-color: #4A90E2; /* Cor azul para o botão */
+  color: white; /* Texto branco */
+  padding: 12px 20px; /* Padding maior para o botão */
+  border: none; /* Remove bordas padrão */
+  border-radius: 4px; /* Bordas arredondadas */
+  font-size: 1.1rem; /* Tamanho de fonte um pouco maior */
+  cursor: pointer; /* Muda o cursor para uma mãozinha ao passar sobre o botão */
+  transition: background-color 0.3s; /* Adiciona transição suave para mudança de cor */
 }
 
-a.secondary {
-  border-color: var(--gray-alpha-200);
-  min-width: 180px;
+/* Estilo para o botão quando o mouse está sobre ele */
+.submit-btn:hover {
+  background-color: #357ABD; /* Muda para um azul mais escuro */
 }
 
-.footer {
-  grid-row-start: 3;
-  display: flex;
-  gap: 24px;
+/* Estilo para a lista de entradas */
+.entries-list {
+  list-style-type: none; /* Remove os marcadores de lista */
+  padding: 0; /* Remove o padding */
+  margin-top: 20px; /* Adiciona espaçamento acima da lista */
 }
 
-.footer a {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* Estilo para cada item da lista de entradas */
+.entry-item {
+  background-color: #f9f9f9; /* Cor de fundo suave e clara */
+  margin: 10px 0; /* Espaçamento entre os itens */
+  padding: 15px; /* Padding ao redor de cada item */
+  border-radius: 8px; /* Bordas arredondadas */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra suave para dar profundidade */
 }
 
-.footer img {
-  flex-shrink: 0;
+/* Estilo para a mensagem que indica que não há itens na lista */
+.empty-message {
+  text-align: center; /* Centraliza o texto */
+  font-style: italic; /* Aplica itálico ao texto */
+  color: #888; /* Cor cinza para o texto */
 }
 
-/* Enable hover only on non-touch devices */
-@media (hover: hover) and (pointer: fine) {
-  a.primary:hover {
-    background: var(--button-primary-hover);
-    border-color: transparent;
-  }
-
-  a.secondary:hover {
-    background: var(--button-secondary-hover);
-    border-color: transparent;
-  }
-
-  .footer a:hover {
-    text-decoration: underline;
-    text-underline-offset: 4px;
-  }
+/* Estilo para os itens que correspondem à pesquisa */
+.match {
+  color: green; /* Cor verde para as correspondências */
 }
 
+/* Estilo para os itens que não correspondem à pesquisa */
+.no-match {
+  color: red; /* Cor vermelha para as não correspondências */
+}
+
+/* Estilo para o filtro de entradas */
+.filter-container {
+  margin-bottom: 20px; /* Adiciona espaço abaixo do filtro */
+}
+
+/* Estilo para o campo de seleção do filtro */
+.filter-select {
+  padding: 8px; /* Padding dentro do campo de seleção */
+  font-size: 1rem; /* Tamanho de fonte do campo de seleção */
+  margin-top: 5px; /* Espaçamento no topo */
+  border-radius: 4px; /* Bordas arredondadas */
+  border: 1px solid #ccc; /* Borda cinza clara */
+  max-width: 200px; /* Largura máxima do campo de seleção */
+}
+
+/* Estilo para telas menores (máximo de 600px) */
 @media (max-width: 600px) {
-  .page {
-    padding: 32px;
-    padding-bottom: 80px;
+  .container {
+      width: 100%; /* A container ocupa toda a largura da tela */
+      padding: 15px; /* Padding reduzido */
   }
 
-  .main {
-    align-items: center;
+  .form {
+      width: 100%; /* O formulário ocupa toda a largura */
   }
 
-  .main ol {
-    text-align: center;
+  .input-field {
+      max-width: 100%; /* O campo de entrada ocupa toda a largura */
   }
 
-  .ctas {
-    flex-direction: column;
-  }
-
-  .ctas a {
-    font-size: 14px;
-    height: 40px;
-    padding: 0 16px;
-  }
-
-  a.secondary {
-    min-width: auto;
-  }
-
-  .footer {
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
+  .submit-btn {
+      width: 100%; /* O botão ocupa toda a largura disponível */
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .logo {
-    filter: invert();
-  }
+/* Estilo para o contêiner de exportação */
+.export-container {
+  text-align: center; /* Centraliza o conteúdo */
+  margin-top: 20px; /* Adiciona espaçamento acima */
+}
+
+/* Estilo para o botão de exportação */
+.export-btn {
+  padding: 10px 20px; /* Padding maior para o botão */
+  background-color: #28a745; /* Cor verde para o botão */
+  color: white; /* Texto branco */
+  border: none; /* Remove bordas */
+  border-radius: 5px; /* Bordas arredondadas */
+  font-size: 1.1em; /* Aumenta o tamanho da fonte */
+  cursor: pointer; /* Muda o cursor para uma mãozinha ao passar sobre o botão */
+  transition: all 0.3s ease; /* Transição suave em todas as mudanças */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra suave ao redor do botão */
+}
+
+/* Estilo para o botão de exportação quando o mouse está sobre ele */
+.export-btn:hover {
+  background-color: #218838; /* Muda para um tom mais escuro de verde */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Aumenta a sombra */
 }
