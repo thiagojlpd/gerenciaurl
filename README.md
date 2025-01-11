@@ -76,6 +76,7 @@ Agora, dentro de app/api/urls, crie o arquivo route.js e cole o código da API q
 Dentro do diretório do projeto, instale os pacotes necessários:
 
 npm install prisma @prisma/client pg
+npm install primereact primeicons
 npm install
 
 Inicie o servidor de desenvolvimento:
