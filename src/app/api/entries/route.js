@@ -61,3 +61,45 @@ export async function GET() {
 
   return NextResponse.json(results); // Retorna a lista de URLs com a validação dos IPs
 }
+
+// API para processar o upload de arquivos de zona DNS
+export async function POST_ZONA(req) {
+  const formData = await req.formData(); // Pega o arquivo enviado
+  const file = formData.get('zoneFile'); // O arquivo é extraído do FormData
+  
+  if (!file) {
+    return NextResponse.json({ error: "Arquivo de zona DNS não fornecido" }, { status: 400 });
+  }
+
+  const content = await file.text(); // Lê o conteúdo do arquivo como texto
+  const lines = content.split('\n'); // Divide o arquivo em linhas
+  
+  let newEntries = [];
+
+  for (const line of lines) {
+    // Regex para capturar registros do tipo A (domínio e IP esperado)
+    const regex = /(\S+)\s+IN\s+A\s+(\S+)/;
+    const match = line.match(regex);
+    
+    if (match) {
+      const url = match[1]; // Nome do domínio
+      const ip = match[2];  // IP esperado
+
+      try {
+        // Tenta salvar a nova entrada no banco de dados
+        const newEntry = await prisma.urlEntry.create({
+          data: { url, ip },
+        });
+        newEntries.push(newEntry);
+      } catch (error) {
+        console.error(`Erro ao salvar a entrada para ${url}:`, error);
+      }
+    }
+  }
+
+  if (newEntries.length === 0) {
+    return NextResponse.json({ error: "Nenhuma entrada válida encontrada no arquivo." }, { status: 400 });
+  }
+
+  return NextResponse.json(newEntries, { status: 201 }); // Retorna as entradas salvas com sucesso
+}

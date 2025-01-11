@@ -1,0 +1,15 @@
+body {
+    background-image: url('/imagem-de-fundo.png');
+    background-size: cover; /* Faz com que a imagem cubra toda a tela */
+    background-position: center; /* Centraliza a imagem */
+    background-repeat: no-repeat; /* Impede que a imagem se repita */
+  }
+  
+  .app-container {
+    position: relative;
+    background-color: rgba(255, 255, 255, 0.2); /* Fundo branco com 70% de opacidade */
+    padding: 20px;
+    border-radius: 8px;
+    z-index: 2; /* Para garantir que o conteúdo tenha prioridade sobre a imagem de fundo */
+  }
+  
