@@ -106,6 +106,7 @@ export default function HomePage() {
 
 
   const handleZoneFileUpload = (e) => {
+
     const file = e.target.files[0];
     setZoneFile(file);
 
@@ -203,9 +204,11 @@ export default function HomePage() {
 
   // Função para excluir todas as entradas
   const deleteAllEntries = async () => {
+    
     const confirmed = window.confirm('Tem certeza de que deseja excluir todas as entradas?');
     if (confirmed) {
       try {
+        setUpdateMessage('Deletando...');
         const res = await fetch('/api/entries', {
           method: 'DELETE',
         });
@@ -215,9 +218,13 @@ export default function HomePage() {
         } else {
           alert('Erro ao excluir as entradas.');
         }
+        setUpdateMessage('Lista de entradas deletada!');
+        setTimeout(() => setUpdateMessage(''), 3000);
       } catch (error) {
         console.error('Erro ao excluir as entradas:', error);
         alert('Erro ao excluir as entradas.');
+        setUpdateMessage('Lista de entradas não pode ser deletada!');
+        setTimeout(() => setUpdateMessage(''), 3000);
       }
     }
   };
