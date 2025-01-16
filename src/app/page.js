@@ -310,7 +310,7 @@ export default function HomePage() {
             </div>
           )}
 
-          <DataTable value={filteredEntries} paginator rows={3} className="p-mt-2">
+          <DataTable value={filteredEntries} paginator rows={50} className="p-mt-2">
             <Column field="url" header="URL" sortable></Column>
             <Column field="expectedIp" header="IP Esperado" sortable></Column>
             <Column field="resolvedIp" header="IP Resolvido" sortable></Column>
