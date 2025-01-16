@@ -1,10 +1,9 @@
 import { PrismaClient } from "@prisma/client"; // Importa o cliente do Prisma para interagir com o banco de dados
 import { NextResponse } from "next/server"; // Importa NextResponse para manipular respostas HTTP, como retornos JSON e status de resposta
 import dns from "dns/promises"; // Importa o módulo DNS na versão de promessas para resolver IPs de URLs de forma assíncrona
-
 import fetch from "node-fetch"; // Para obter código HTTP da URL
 import ping from "ping"; // Para testar conectividade via ping
-
+import https from 'https'; // Importa o módulo HTTPS para configurar o agente
 
 const prisma = new PrismaClient(); // Instancia o cliente do Prisma, permitindo interações com o banco de dados
 
@@ -30,42 +29,6 @@ export async function POST(req) {
 }
 
 // API para listar URLs e validar IP associado
-// export async function GET() {
-//   try {
-//     // Busca todas as entradas da tabela urlEntry no banco de dados usando o Prisma
-//     const entries = await prisma.urlEntry.findMany();
-
-//     // Faz uma resolução de IP para cada entrada usando o DNS
-//     const results = await Promise.all(entries.map(async (entry) => {
-//       try {
-//         const urlWithoutProtocol = entry.url.replace(/^https?:\/\//, ''); // Remove o protocolo (http:// ou https://) da URL
-//         const { address } = await dns.lookup(urlWithoutProtocol); // Resolve o IP da URL sem o protocolo
-//         return {
-//           url: entry.url,
-//           expectedIp: entry.ip,
-//           resolvedIp: address, // IP resolvido pelo DNS
-//           match: address === entry.ip, // Compara o IP resolvido com o esperado
-//         };
-//       } catch (error) {
-//         // Se ocorrer um erro na resolução do IP, retorna o erro e informa que a resolução falhou
-//         return {
-//           url: entry.url,
-//           expectedIp: entry.ip,
-//           resolvedIp: null,
-//           match: false,
-//           error: "Falha ao resolver o IP", // Erro ao resolver o IP
-//         };
-//       }
-//     }));
-
-//     return NextResponse.json(results); // Retorna os resultados com status 200 (OK)
-//   } catch (error) {
-//     // Se ocorrer um erro ao buscar as entradas, retorna uma resposta de erro com status 500
-//     return NextResponse.json({ error: "Erro ao buscar entradas", details: error.message }, { status: 500 });
-//   }
-// }
-
-
 export async function GET() {
   try {
     // Busca todas as entradas da tabela urlEntry no banco de dados
@@ -76,7 +39,7 @@ export async function GET() {
       entries.map(async (entry) => {
         let resolvedIp = null;
         let match = false;
-        let httpStatus = null;
+        let httpStatus = ""; // Inicializa httpStatus como uma string vazia
         let pingExpectedIp = false;
         let pingResolvedIp = false;
 
@@ -85,36 +48,47 @@ export async function GET() {
           const urlWithoutProtocol = entry.url.replace(/^https?:\/\//, ""); // Remove protocolo
           const { address } = await dns.lookup(urlWithoutProtocol);
           resolvedIp = address;
-          match = address === entry.ip;
+          match = address === entry.ip; // Compara o IP resolvido com o IP esperado
         } catch {
           resolvedIp = null;
-          match = false;
+          match = false; // Se não resolver, o IP fica nulo e não há correspondência
         }
 
         // Obtém o código HTTP da URL
         try {
-          let url = entry.url.startsWith("http") ? entry.url : `https://${entry.url}`;
-          const response = await fetch(url, { method: "HEAD" });
-          httpStatus = response.status;
+          let httpUrl = entry.url.startsWith("http") ? entry.url : `http://${entry.url}`;
+          const response = await fetch(httpUrl, { method: "HEAD" });
+          httpStatus = `HTTP ${response.status}`; // Atribui o código HTTP ao httpStatus
         } catch (error) {
           console.error(`Erro ao obter status HTTP para ${entry.url}:`, error);
-          httpStatus = 'Sem código'; 
+          httpStatus = "HTTP falhou"; // Se falhar, define como "HTTP falhou"
+        }
+
+        // Obtém o código HTTPS da URL
+        try {
+          let httpsUrl = entry.url.startsWith("https") ? entry.url : `https://${entry.url}`;
+          const agent = new https.Agent({ rejectUnauthorized: false });
+          const response = await fetch(httpsUrl, { method: "HEAD", agent });
+          httpStatus += ` | HTTPS ${response.status}`; // Adiciona o status HTTPS ao httpStatus
+        } catch (error) {
+          console.error(`Erro ao obter status HTTPS para ${entry.url}:`, error);
+          httpStatus += error.message.includes("UNABLE_TO_VERIFY_LEAF_SIGNATURE")
+            ? " | HTTPS autoassinado" // Se erro de certificado, adiciona "autoassinado"
+            : " | HTTPS falhou"; // Se falhar, define como "HTTPS falhou"
         }
 
         // Testa ping no IP esperado
+        let pingExpectedIpStatus = "Sem IP esperado";
         if (entry.ip) {
-          const pingResponse = await ping.promise.probe(entry.ip);
-          pingExpectedIp = pingResponse.alive ? "Pingou" : "Não pingou";
-        } else {
-          pingExpectedIp = "Sem IP experado";
+          const pingResponse = await ping.promise.probe(entry.ip); // Verifica a conectividade com o IP esperado
+          pingExpectedIpStatus = pingResponse.alive ? "Pingou" : "Não pingou"; // Se respondeu ao ping, marca como "Pingou"
         }
 
         // Testa ping no IP resolvido, se existir
+        let pingResolvedIpStatus = "Sem IP resolvido";
         if (resolvedIp) {
-          const pingResponse = await ping.promise.probe(resolvedIp);
-          pingResolvedIp = pingResponse.alive ? "Pingou" : "Não pingou";
-        } else {
-          pingResolvedIp = "Sem IP resolvido";
+          const pingResponse = await ping.promise.probe(resolvedIp); // Verifica a conectividade com o IP resolvido
+          pingResolvedIpStatus = pingResponse.alive ? "Pingou" : "Não pingou"; // Se respondeu ao ping, marca como "Pingou"
         }
 
         return {
@@ -122,22 +96,22 @@ export async function GET() {
           expectedIp: entry.ip,
           resolvedIp,
           match,
-          httpStatus, // Código HTTP da URL
-          pingExpectedIp, // Ping no IP esperado
-          pingResolvedIp, // Ping no IP resolvido
+          httpStatus, // Contém o status HTTP e HTTPS
+          pingExpectedIp: pingExpectedIpStatus, // Ping no IP esperado
+          pingResolvedIp: pingResolvedIpStatus, // Ping no IP resolvido
         };
       })
     );
 
-    return NextResponse.json(results); // Retorna os resultados
+    return NextResponse.json(results); // Retorna os resultados da verificação
   } catch (error) {
+    // Se ocorrer algum erro, retorna uma resposta de erro com status 500
     return NextResponse.json(
       { error: "Erro ao buscar entradas", details: error.message },
       { status: 500 }
     );
   }
 }
-
 
 // API para processar o upload de arquivos de zona DNS
 export async function POST_ZONA(req) {
@@ -156,7 +130,7 @@ export async function POST_ZONA(req) {
     // Processa cada linha e tenta criar uma entrada no banco de dados
     const newEntries = await Promise.all(lines.map(async (line) => {
       const regex = /^(\S+)\s+IN\s+A\s+(\S+)$/; // Regex para identificar entradas de tipo A (URL e IP)
-      const match = line.match(regex);
+      const match = line.match(regex); // Aplica regex para verificar se a linha está no formato correto
 
       if (match) {
         const [_, url, ip] = match; // Extrai a URL e o IP da linha que corresponde ao regex
@@ -165,7 +139,7 @@ export async function POST_ZONA(req) {
           return await prisma.urlEntry.create({ data: { url, ip } });
         } catch (error) {
           console.error(`Erro ao salvar a entrada para ${url}:`, error); // Caso ocorra erro ao salvar, exibe no console
-          return null;
+          return null; // Retorna null se houver erro ao salvar
         }
       }
       return null; // Retorna null caso a linha não corresponda ao formato esperado

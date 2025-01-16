@@ -1,4 +1,4 @@
-'use client';
+'use client'; // Indica que este código deve ser executado no lado do cliente, não no servidor
 
 import { useState, useEffect, useRef } from 'react';
 import { InputText } from 'primereact/inputtext';
@@ -17,7 +17,9 @@ import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import './globals.css';
 
+// Função principal da página
 export default function HomePage() {
+  // Definição dos estados para o controle dos dados e interações
   const [url, setUrl] = useState('');
   const [ip, setIp] = useState('');
   const [entries, setEntries] = useState([]);
@@ -25,10 +27,11 @@ export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [updateMessage, setUpdateMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false); // Estado de carregamento
-  const [progress, setProgress] = useState(0);
-  const [zoneFile, setZoneFile] = useState(null);
-  const toast = useRef(null);
+  const [progress, setProgress] = useState(0); // Estado para controle de progresso
+  const [zoneFile, setZoneFile] = useState(null); // Estado para armazenar o arquivo de zona DNS
+  const toast = useRef(null); // Referência para exibir notificações
 
+  // Definição das opções de filtro para as entradas
   const filterOptions = [
     { label: 'Todos', value: 'todos' },
     { label: 'IP Correspondente', value: 'correspondente' },
@@ -36,15 +39,16 @@ export default function HomePage() {
     { label: 'IP Não Resolvido', value: 'nao-resolvido' }
   ];
 
+  // Função para buscar as entradas do servidor
   const fetchEntries = async () => {
     try {
-      setUpdateMessage('Carregando...');
-      const res = await fetch('/api/entries');
+      setUpdateMessage('Carregando...'); // Exibe mensagem de carregamento
+      const res = await fetch('/api/entries'); // Requisição para buscar as entradas
       if (res.ok) {
         const data = await res.json();
-        setEntries(data);
+        setEntries(data); // Atualiza o estado com as entradas recebidas
         setUpdateMessage('Lista de entradas atualizada com sucesso!');
-        setTimeout(() => setUpdateMessage(''), 3000);
+        setTimeout(() => setUpdateMessage(''), 3000); // Limita a duração da mensagem
       } else {
         alert('Erro ao carregar as entradas.');
       }
@@ -54,10 +58,12 @@ export default function HomePage() {
     }
   };
 
+  // Executa a busca ao carregar o componente
   useEffect(() => {
     fetchEntries();
   }, []);
 
+  // Função para enviar uma nova entrada (URL e IP) ao servidor
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!url || !ip) {
@@ -72,9 +78,9 @@ export default function HomePage() {
       });
       if (res.ok) {
         alert('Entrada salva com sucesso!');
-        setUrl('');
-        setIp('');
-        fetchEntries();
+        setUrl(''); // Limpa o campo de URL
+        setIp(''); // Limpa o campo de IP
+        fetchEntries(); // Recarrega a lista de entradas
       } else {
         alert('Erro ao salvar a entrada.');
       }
@@ -84,48 +90,39 @@ export default function HomePage() {
     }
   };
 
+  // Função para extrair o domínio base de um arquivo de zona DNS
   const extractBaseDomain = (lines) => {
     for (const line of lines) {
-      // Encontrar a linha que contém o SOA e capturar o domínio
       const soaMatch = line.match(/\S+\s+IN\s+SOA\s+\S+\s+(\S+)/);
       if (soaMatch) {
         const soaDomain = soaMatch[1];
-
-        // Dividir o domínio em partes pelo ponto (.)
-        const parts = soaDomain.split('.');
-
-        // Retornar do segundo até o último segmento do domínio, sem o ponto final
-        const domainWithoutTrailingDot = parts.slice(1).join('.').replace(/\.$/, '');  // Remove o ponto final, se houver
-
+        const parts = soaDomain.split('.'); // Divide o domínio por pontos
+        const domainWithoutTrailingDot = parts.slice(1).join('.').replace(/\.$/, ''); // Retorna o domínio sem o ponto final
         return domainWithoutTrailingDot;
       }
     }
-    return ''; // Caso nenhum SOA seja encontrado, retorna uma string vazia
+    return ''; // Retorna uma string vazia se não encontrar o domínio
   };
 
-
-
+  // Função para fazer o upload do arquivo de zona DNS e processar as entradas
   const handleZoneFileUpload = (e) => {
-
     const file = e.target.files[0];
-    setZoneFile(file);
-
+    setZoneFile(file); // Atualiza o estado com o arquivo carregado
     const reader = new FileReader();
     reader.onload = async (event) => {
       const content = event.target.result;
       const lines = content.split('\n');
       const totalLines = lines.length;
-      setProgress(0); // Inicializa o progresso antes de começar
-
-      const baseDomain = extractBaseDomain(lines);
+      setProgress(0); // Inicializa o progresso antes de começar a leitura do arquivo
+      const baseDomain = extractBaseDomain(lines); // Extrai o domínio base
 
       for (let i = 0; i < totalLines; i++) {
         const line = lines[i];
         const regex = /^(\S+)\s+IN\s+A\s+(\S+)/;
-        const match = line.match(regex);
+        const match = line.match(regex); // Encontra as entradas do tipo A (IPv4)
 
         if (match && baseDomain) {
-          const url = `${match[1]}.${baseDomain}`;
+          const url = `${match[1]}.${baseDomain}`; // Cria a URL a partir da entrada
           const ip = match[2];
           try {
             const res = await fetch('/api/entries', {
@@ -142,18 +139,17 @@ export default function HomePage() {
             console.error('Erro ao enviar os dados:', error);
           }
         }
-        setProgress(Math.round(((i + 1) / totalLines) * 100)); // Atualiza a barra de progresso
+        setProgress(Math.round(((i + 1) / totalLines) * 100)); // Atualiza o progresso
       }
-
       alert('Entradas de zona DNS carregadas com sucesso!');
-      fetchEntries();
+      fetchEntries(); // Recarrega a lista de entradas
       setProgress(0); // Reseta o progresso após o upload
     };
 
-    reader.readAsText(file);
+    reader.readAsText(file); // Lê o conteúdo do arquivo como texto
   };
 
-
+  // Função para exportar as entradas para um arquivo Excel
   const exportToExcel = () => {
     const formattedEntries = entries.map(entry => ({
       URL: entry.url || 'N/A',
@@ -169,22 +165,61 @@ export default function HomePage() {
     const ws = XLSX.utils.json_to_sheet(formattedEntries);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Entradas');
-    XLSX.writeFile(wb, 'entradas.xlsx');
+    XLSX.writeFile(wb, 'entradas.xlsx'); // Cria o arquivo Excel
   };
 
+  // Funções para exibir os status das entradas com diferentes templates
   const statusTemplate = (rowData) => {
     let status, statusClass;
     if (!rowData.resolvedIp) {
-      status = 'IP Não Resolvido';
+      status = 'IP não Resolvido';
       statusClass = 'p-badge-warning';
     } else {
-      status = rowData.match ? 'IP Correspondente' : 'IP Não Correspondente';
+      status = rowData.match ? 'IP Correspondentes' : 'IP não Correspondentes';
       statusClass = rowData.match ? 'p-badge-success' : 'p-badge-danger';
     }
     return <Badge value={status} className={statusClass} />;
   };
 
-  // Função para filtrar as entradas
+  // Função para exibir o status HTTP
+  const httpTemplate = (rowData) => {
+    let status, statusClass;
+    if (!rowData.httpStatus) {
+      status = 'Sem código';
+      statusClass = 'p-badge-warning';
+    } else {
+      status = rowData.httpStatus;
+      statusClass = rowData.httpStatus.includes('200') ? (rowData.httpStatus.includes('falhou') ? 'p-badge-light' : 'p-badge-success') : 'p-badge-danger';
+    }
+    return <Badge value={status} className={statusClass} />;
+  };
+
+  // Funções para exibir os status de ping para os IPs
+  const pingResolvedIpTemplate = (rowData) => {
+    let status, statusClass;
+    if (!rowData.pingResolvedIp) {
+      status = 'IP não Resolvido';
+      statusClass = 'p-badge-warning';
+    } else {
+      status = rowData.pingResolvedIp;
+      statusClass = rowData.pingResolvedIp == 'Pingou' ? 'p-badge-success' : 'p-badge-danger';
+    }
+    return <Badge value={status} className={statusClass} />;
+  };
+
+  const pingExpectedIpTemplate = (rowData) => {
+    let status, statusClass;
+    if (!rowData.pingExpectedIp) {
+      status = 'Sem IP cadastrado';
+      statusClass = 'p-badge-warning';
+    } else {
+      status = rowData.pingExpectedIp;
+      statusClass = rowData.pingExpectedIp == 'Pingou' ? 'p-badge-success' : 'p-badge-danger';
+    }
+    return <Badge value={status} className={statusClass} />;
+  };
+
+  // Função para filtrar as entradas com base nos critérios definidos
   const filteredEntries = entries.filter((entry) => {
     const url = entry.url?.toLowerCase() || '';
     const ip = entry.resolvedIp?.toLowerCase() || ''; // Alterado de `entry.ip` para `entry.resolvedIp`
@@ -201,10 +236,8 @@ export default function HomePage() {
     return matchesSearchTerm && matchesFilter;
   });
 
-
   // Função para excluir todas as entradas
   const deleteAllEntries = async () => {
-    
     const confirmed = window.confirm('Tem certeza de que deseja excluir todas as entradas?');
     if (confirmed) {
       try {
@@ -213,13 +246,13 @@ export default function HomePage() {
           method: 'DELETE',
         });
         if (res.ok) {
-          setEntries([]);
+          setEntries([]); // Limpa todas as entradas da lista
           alert('Todas as entradas foram excluídas com sucesso.');
         } else {
           alert('Erro ao excluir as entradas.');
         }
         setUpdateMessage('Lista de entradas deletada!');
-        setTimeout(() => setUpdateMessage(''), 3000);
+        setTimeout(() => setUpdateMessage(''), 3000); // Limita a duração da mensagem
       } catch (error) {
         console.error('Erro ao excluir as entradas:', error);
         alert('Erro ao excluir as entradas.');
@@ -229,6 +262,7 @@ export default function HomePage() {
     }
   };
 
+  // Renderiza a interface de usuário
   return (
     <div className="app-container">
       <Menubar model={[{ label: 'Verifica resolução DNS', icon: 'pi pi-home' }, { label: 'Sobre', icon: 'pi pi-info-circle' }]} className="menu-bar" />
@@ -281,9 +315,9 @@ export default function HomePage() {
             <Column field="expectedIp" header="IP Esperado" sortable></Column>
             <Column field="resolvedIp" header="IP Resolvido" sortable></Column>
             <Column field="match" header="Status" body={statusTemplate} sortable></Column>
-            <Column field="httpStatus" header="HTTP" sortable></Column>
-            <Column field="pingExpectedIp" header="Ping IP esperado" sortable></Column>
-            <Column field="pingResolvedIp" header="Ping IP resolvido" sortable></Column>
+            <Column field="httpStatus" header="HTTP" body={httpTemplate} sortable></Column>            
+            <Column field="pingExpectedIp" header="Ping IP esperado" body={pingExpectedIpTemplate} sortable></Column>
+            <Column field="pingResolvedIp" header="Ping IP resolvido" body={pingResolvedIpTemplate} sortable></Column>
           </DataTable>
 
         </Card>
