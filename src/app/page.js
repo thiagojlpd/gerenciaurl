@@ -218,6 +218,18 @@ export default function HomePage() {
     }
     return <Badge value={status} className={statusClass} />;
   };
+  
+  const ipResolvidoTemplate = (rowData) => {
+    let status, statusClass;
+    if (!rowData.resolvedIp) {
+      status = 'Sem IP resolvido';
+      statusClass = 'p-badge-danger';
+    } else {
+      status = rowData.resolvedIp;
+      statusClass = rowData.resolvedIp == rowData.expectedIp ? 'p-badge-success' : 'p-badge-danger';
+    }
+    return <Badge value={status} className={statusClass} />;
+  };
 
   // Função para filtrar as entradas com base nos critérios definidos
   const filteredEntries = entries.filter((entry) => {
@@ -279,7 +291,7 @@ export default function HomePage() {
               <InputText value={ip} onChange={(e) => setIp(e.target.value)} required />
             </div>
             <p />
-            <Button label="Salvar Entrada" icon="pi pi-save" type="submit" className="p-mt-2" />
+            <Button label="" icon="pi pi-save" type="submit" className="p-mt-2" />
           </form>
           <p></p>
           <input type="file" accept=".txt" onChange={handleZoneFileUpload} style={{ display: 'none' }} id="zone-file-upload" />
@@ -294,12 +306,12 @@ export default function HomePage() {
         <p />
         <Card title="Entradas Salvas" className="p-mt-4 card-transparent">
           Filtrar por: <Dropdown value={filter} options={filterOptions} onChange={(e) => setFilter(e.value)} placeholder="Selecione um filtro" /> <span></span>
-          Pesquisar: <InputText value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Pesquisar" /> <span></span>
-          <Button label="Atualizar Lista" icon="pi pi-refresh" className="update-btn p-mt-3" onClick={fetchEntries} />
+          URL: <InputText value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Pesquisar" /> <span></span>
+          <Button label="" icon="pi pi-refresh" className="update-btn p-mt-3" onClick={fetchEntries} />
           <span> </span>
-          <Button label="Exportar para Excel" icon="pi pi-file-excel" className="p-mt-" onClick={exportToExcel} />
+          <Button label="" icon="pi pi-file-excel" className="p-mt-" onClick={exportToExcel} />
           <span> </span>
-          <Button label="Excluir Todas as Entradas" icon="pi pi-trash" className="p-mt-2 p-button-danger" onClick={deleteAllEntries} />
+          <Button label="" icon="pi pi-trash" className="p-mt-2 p-button-danger" onClick={deleteAllEntries} />
           {isLoading ? ( <span>Carregando...</span> ) : ( <span>{updateMessage}</span> )}
           <br /><br />
 
@@ -313,8 +325,8 @@ export default function HomePage() {
           <DataTable value={filteredEntries} paginator rows={50} className="p-mt-2">
             <Column field="url" header="URL" sortable></Column>
             <Column field="expectedIp" header="IP Esperado" sortable></Column>
-            <Column field="resolvedIp" header="IP Resolvido" sortable></Column>
-            <Column field="match" header="Status" body={statusTemplate} sortable></Column>
+            <Column field="resolvedIp" header="IP Resolvido" body={ipResolvidoTemplate} sortable></Column>
+            {/* <Column field="match" header="Status" body={statusTemplate} sortable></Column> */}
             <Column field="httpStatus" header="HTTP" body={httpTemplate} sortable></Column>            
             <Column field="pingExpectedIp" header="Ping IP esperado" body={pingExpectedIpTemplate} sortable></Column>
             <Column field="pingResolvedIp" header="Ping IP resolvido" body={pingResolvedIpTemplate} sortable></Column>
