@@ -323,26 +323,20 @@ export default function HomePage() {
           )}
 
           <DataTable value={filteredEntries} paginator rows={50} className="p-mt-2">
-            <Column field="url" header="URL" sortable />
-            <Column field="expectedIp" header="IP Esperado" sortable />
-            <Column field="resolvedIp" header="IP Resolvido" body={ipResolvidoTemplate} sortable />
-            
-            <Column
-              field="nslookup.serverAddress"
-              header="DNS usado"
-              body={(rowData) => (
-                <Badge
-                  value={rowData.nslookup?.serverAddress || "Não disponível"} // Garantia de acesso seguro
-                  className="p-badge-light" // Corrigido para uma string válida
-                />
-              )}
-              sortable
-            />
-            {/* <Column field="match" header="Status" body={statusTemplate} sortable /> */}
-            <Column field="httpStatus" header="HTTP" body={httpTemplate} sortable />
-            <Column field="pingExpectedIp" header="Ping IP esperado" body={pingExpectedIpTemplate} sortable />
-            <Column field="pingResolvedIp" header="Ping IP resolvido" body={pingResolvedIpTemplate} sortable />
+            <Column field="url" header="URL" sortable></Column>
+            <Column field="expectedIp" header="IP Esperado" sortable></Column>
+            <Column field="resolvedIp" header="IP Resolvido" body={ipResolvidoTemplate} sortable></Column>
+            <Column field="dnsServerIp" header="Servidor DNS" sortable></Column>
+            <Column field="isAuthoritative" header="Resposta Autoritativa" body={(rowData) => (
+              rowData.isAuthoritative ?
+                <Badge value="Sim" className="p-badge-light" /> :
+                <Badge value="Não" className="p-badge-light" />
+            )} sortable></Column>
+            <Column field="httpStatus" header="HTTP" body={httpTemplate} sortable></Column>
+            <Column field="pingExpectedIp" header="Ping IP esperado" body={pingExpectedIpTemplate} sortable></Column>
+            <Column field="pingResolvedIp" header="Ping IP resolvido" body={pingResolvedIpTemplate} sortable></Column>
           </DataTable>
+
 
         </Card>
       </div>

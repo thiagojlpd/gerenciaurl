@@ -4,6 +4,7 @@ import dns from "dns/promises"; // Importa o módulo DNS na versão de promessas
 import fetch from "node-fetch"; // Para obter código HTTP da URL
 import ping from "ping"; // Para testar conectividade via ping
 import https from 'https'; // Importa o módulo HTTPS para configurar o agente
+import { exec } from "child_process";
 
 const prisma = new PrismaClient(); // Instancia o cliente do Prisma, permitindo interações com o banco de dados
 
@@ -28,6 +29,58 @@ export async function POST(req) {
   }
 }
 
+
+
+// Função para executar o comando nslookup
+function nslookup(url) {
+  return new Promise((resolve, reject) => {
+    exec(`nslookup ${url}`, (error, stdout, stderr) => {
+      if (error) {
+        return reject(`Erro ao executar nslookup: ${stderr}`);
+      }
+
+      // Parse a saída do nslookup
+      const serverMatch = stdout.match(/Server:\s+(.+)/i); // 'i' para ignorar maiúsculas/minúsculas
+      const addressMatch = stdout.match(/Address:\s+([^\s]+)/); // Captura apenas o endereço
+
+      resolve({
+        dnsServerUsed: serverMatch ? serverMatch[1].trim() : "Não encontrado",
+        serverAddress: addressMatch ? addressMatch[1].trim() : "Não encontrado",
+        output: stdout, // Saída completa do nslookup
+      });
+
+    });
+  });
+}
+
+
+async function getTitleFromUrl(url) {
+  try {
+    // Garantir que a URL tenha o protocolo (http:// ou https://)
+    if (!/^https?:\/\//i.test(url)) {
+      url = `http://${url}`; // Adiciona http:// se não estiver presente
+    }
+
+    const response = await fetch(url, { method: "GET" });
+
+    // Verifica se a resposta foi bem-sucedida (status 200)
+    if (!response.ok) {
+      return `Erro ao acessar a URL: ${response.statusText}`;
+    }
+
+    const html = await response.text();
+    const titleMatch = html.match(/<title>(.*?)<\/title>/i);
+
+    return titleMatch ? titleMatch[1].trim() : "Título não encontrado";
+  } catch (error) {
+    console.error(`Erro ao obter título de ${url}:`, error);
+    return `Erro ao obter título: ${error.message}`;
+  }
+}
+
+
+
+
 // API para listar URLs e validar IP associado
 export async function GET() {
   try {
@@ -42,16 +95,24 @@ export async function GET() {
         let httpStatus = ""; // Inicializa httpStatus como uma string vazia
         let pingExpectedIp = false;
         let pingResolvedIp = false;
+        let nslookupResult = null;
 
         // Resolve o IP da URL
         try {
-          const urlWithoutProtocol = entry.url.replace(/^https?:\/\//, ""); // Remove protocolo
+          const urlWithoutProtocol = entry.url.replace(/^https?:\/\//, ""); // Remove protocol
           const { address } = await dns.lookup(urlWithoutProtocol);
           resolvedIp = address;
           match = address === entry.ip; // Compara o IP resolvido com o IP esperado
         } catch {
           resolvedIp = null;
-          match = false; // Se não resolver, o IP fica nulo e não há correspondência
+          match = false;
+        }
+
+        // Executa nslookup para obter informações adicionais
+        try {
+          nslookupResult = await nslookup(entry.url);
+        } catch (error) {
+          nslookupResult = { error: error.message };
         }
 
         // Obtém o código HTTP da URL
@@ -77,6 +138,14 @@ export async function GET() {
             : " | HTTPS falhou"; // Se falhar, define como "HTTPS falhou"
         }
 
+        // // Obtém o título da página
+        // try {
+        //   const httpUrl = entry.url.startsWith("http") ? entry.url : `http://${entry.url}`;
+        //   title = await getTitleFromUrl(httpUrl);
+        // } catch {
+        //   title = "Título não encontrado";
+        // }
+
         // Testa ping no IP esperado
         let pingExpectedIpStatus = "Sem IP esperado";
         if (entry.ip) {
@@ -95,6 +164,7 @@ export async function GET() {
           url: entry.url,
           expectedIp: entry.ip,
           resolvedIp,
+          nslookup: nslookupResult,
           match,
           httpStatus, // Contém o status HTTP e HTTPS
           pingExpectedIp: pingExpectedIpStatus, // Ping no IP esperado
