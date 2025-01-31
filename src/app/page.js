@@ -10,8 +10,8 @@ import { Column } from 'primereact/column';
 import { Badge } from 'primereact/badge';
 import { Menubar } from 'primereact/menubar';
 import * as XLSX from 'xlsx';
-import { Toast } from 'primereact/toast';
 import { ProgressBar } from 'primereact/progressbar';
+import { useRouter } from 'next/navigation';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
@@ -30,6 +30,10 @@ export default function HomePage() {
   const [progress, setProgress] = useState(0); // Estado para controle de progresso
   const [zoneFile, setZoneFile] = useState(null); // Estado para armazenar o arquivo de zona DNS
   const toast = useRef(null); // Referência para exibir notificações
+  const router = useRouter();
+
+
+  const [urlAnaliseDNS, setUrlAnaliseDNS] = useState('');
 
   // Definição das opções de filtro para as entradas
   const filterOptions = [
@@ -39,6 +43,22 @@ export default function HomePage() {
     { label: 'IP Não Resolvido', value: 'nao-resolvido' }
   ];
 
+  const handleAboutNavigation = () => {
+    router.push('/sobre'); // Navega para a página "/sobre"
+  };
+
+  const handleAHomeNavigation = () => {
+    router.push('/'); // Navega para a página "/sobre"
+  };
+
+  const handleADnsNavigation = () => {
+    router.push('/dns'); // Navega para a página "/sobre"
+  };
+
+  const handleCapaNavigation = () => {
+    router.push('/capa'); // Navega para a página "/sobre"
+  };
+  
   // Função para buscar as entradas do servidor
   const fetchEntries = async () => {
     try {
@@ -89,6 +109,9 @@ export default function HomePage() {
       alert('Erro ao salvar a entrada.');
     }
   };
+
+
+
 
   // Função para extrair o domínio base de um arquivo de zona DNS
   const extractBaseDomain = (lines) => {
@@ -277,7 +300,7 @@ export default function HomePage() {
   // Renderiza a interface de usuário
   return (
     <div className="app-container">
-      <Menubar model={[{ label: 'Verifica resolução DNS', icon: 'pi pi-home' }, { label: 'Sobre', icon: 'pi pi-info-circle' }]} className="menu-bar" />
+      <Menubar model={[{ label: 'URL', icon: 'pi pi-sync', command: handleAHomeNavigation }, { label: 'DNS', icon: 'pi pi-share-alt', command: handleADnsNavigation }, { label: 'Sobre', icon: 'pi pi-info-circle', command: handleAboutNavigation }, { label: 'Capa', icon: 'pi pi-info-circle', command: handleCapaNavigation }]} className="menu-bar" />
       <br />
       <div className="p-4">
         <Card title="Gerenciamento de URLs" className="card-transparent">
@@ -326,7 +349,7 @@ export default function HomePage() {
             <Column field="url" header="URL" sortable />
             <Column field="expectedIp" header="IP Esperado" sortable />
             <Column field="resolvedIp" header="IP Resolvido" body={ipResolvidoTemplate} sortable />
-            
+
             <Column
               field="nslookup.serverAddress"
               header="DNS usado"

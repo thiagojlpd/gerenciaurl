@@ -138,14 +138,6 @@ export async function GET() {
             : " | HTTPS falhou"; // Se falhar, define como "HTTPS falhou"
         }
 
-        // // Obtém o título da página
-        // try {
-        //   const httpUrl = entry.url.startsWith("http") ? entry.url : `http://${entry.url}`;
-        //   title = await getTitleFromUrl(httpUrl);
-        // } catch {
-        //   title = "Título não encontrado";
-        // }
-
         // Testa ping no IP esperado
         let pingExpectedIpStatus = "Sem IP esperado";
         if (entry.ip) {
@@ -240,3 +232,35 @@ export async function DELETE() {
     return NextResponse.json({ error: "Erro ao excluir todas as entradas", details: error.message }, { status: 500 });
   }
 }
+
+
+
+////////////////////////////////////////////////////
+// SECURITY
+
+export async function verificarDnssec(domain) {
+  try {
+    // Realiza a consulta DNS
+    const registros = await dns.resolve(domain, 'ANY');
+
+    // Filtra registros DNSSEC (exemplo com RRSIG)
+    const registrosDnssec = registros.filter((registro) => typeof registro === 'object' && registro.type === 'RRSIG');
+
+    const resposta = registrosDnssec.length > 0 
+      ? { status: "sucesso", mensagem: "DNSSEC assinado", registros: registrosDnssec }
+      : { status: "sucesso", mensagem: "DNSSEC não assinado", registros: [] };
+
+    return JSON.stringify(resposta);
+
+  } catch (error) {
+    console.error('Erro ao verificar DNSSEC:', error);
+    return JSON.stringify({
+      status: "erro",
+      mensagem: "Erro ao verificar DNSSEC",
+      detalhes: error.message,
+    });
+  }
+}
+
+
+

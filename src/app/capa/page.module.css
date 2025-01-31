@@ -1,0 +1,1153 @@
+.art-container {
+	position: relative;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	width: 100%;
+	height: 100vh;
+	background: rgba(15, 15, 15, 0.8);
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
+}
+
+.text-element {
+	position: relative;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background: rgba(16, 177, 86, 0.03);
+	transition: all 0.3s ease;
+}
+
+.text-element h1 {
+	font-size: clamp(3rem, 6vw, 5rem);
+	font-weight: 800;
+	letter-spacing: 0.2em;
+	transition: transform 0.3s ease;
+	transform-origin: center;
+}
+
+.text-element:hover h1 {
+	transform: scale(1.2);
+}
+
+.text-element:nth-child(1) h1,
+.text-element:nth-child(3) h1 {
+	transform: scale(1);
+	transition: transform 0.3s ease;
+}
+
+.text-element:nth-child(1):hover h1,
+.text-element:nth-child(3):hover h1 {
+	transform: scale(1.2);
+}
+
+/* Effets au survol */
+.text-element:hover {
+	background: rgba(255, 255, 255, 0.05);
+	transform: translateY(-10px) rotateX(10deg) rotateY(-10deg) scale(1.05);
+	box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Styles spécifiques pour chaque élément */
+.text-element:nth-child(1) {
+	position: relative;
+	overflow: hidden;
+	background: linear-gradient(
+		135deg,
+		#1a1b3a,
+		/* Bleu nuit foncé - couleur de base */ #232551,
+		/* Bleu-violet moyen - transition */ #2c2f66 /* Indigo profond - accent */
+	);
+	cursor: none;
+	user-select: none;
+}
+
+/* Effet de dessin automatique */
+.drawing-canvas {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+}
+
+.geometric-shape {
+	position: absolute;
+	border: 2px solid rgba(255, 255, 255, 0.1);
+	opacity: 0;
+	animation: shapeAppear var(--appear-duration, 2s) ease-out forwards;
+	animation-delay: var(--appear-delay, 0s);
+}
+
+/* Styles du texte principal */
+.text-element:nth-child(1) h1 {
+	position: relative;
+	z-index: 2;
+	font-family: "Montserrat", sans-serif;
+	font-size: clamp(3rem, 6vw, 5rem);
+	font-weight: 800;
+	letter-spacing: 0.2em;
+	background: linear-gradient(
+		45deg,
+		#ffffff,
+		/* Blanc pur - maximum de lisibilité */ #e2e8f0
+			/* Gris très clair - maintien du contraste */
+	);
+	background-size: 300% 300%;
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+	animation: gradientFlow 8s ease infinite;
+	text-shadow: 0 0 20px rgba(255, 255, 255, 0.5),
+		0 0 40px rgba(255, 255, 255, 0.3);
+}
+
+/* Curseur personnalisé */
+.pencil-cursor {
+	position: fixed;
+	width: 24px;
+	height: 24px;
+	pointer-events: none;
+	z-index: 1000;
+	opacity: 0;
+	transition: opacity 0.3s ease;
+	mix-blend-mode: difference;
+}
+
+/* Animations */
+@keyframes shapeAppear {
+	0% {
+		opacity: 0;
+		transform: scale(0) rotate(-45deg);
+	}
+
+	50% {
+		opacity: 0.8;
+		transform: scale(1.2) rotate(0deg);
+	}
+
+	100% {
+		opacity: 0.4;
+		transform: scale(1) rotate(0deg);
+	}
+}
+
+@keyframes gradientFlow {
+	0% {
+		background-position: 0% 50%;
+	}
+
+	50% {
+		background-position: 100% 50%;
+	}
+
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
+/* Effet de trait de pinceau */
+.brush-stroke {
+	position: absolute;
+	background: linear-gradient(
+		45deg,
+		rgba(255, 107, 107, 0.2),
+		rgba(78, 205, 196, 0.2)
+	);
+	border-radius: 50%;
+	mix-blend-mode: overlay;
+	filter: blur(5px);
+}
+
+/* Styles pour le deuxième élément */
+.text-element:nth-child(2) {
+	cursor: none !important;
+	overflow: hidden;
+	background: linear-gradient(to bottom, #87ceeb, #e0f6ff);
+}
+
+/* Style du curseur avion */
+.custom-plane-cursor {
+	position: fixed;
+	width: 20px;
+	height: 20px;
+	background-image: url("cursor-plane.png");
+	background-size: contain;
+	background-repeat: no-repeat;
+	pointer-events: none;
+	z-index: 9999;
+	visibility: hidden;
+	opacity: 0;
+	transition: opacity 0.3s ease;
+	transform: translate(-50%, -50%) scale(0);
+}
+
+.custom-plane-cursor.active {
+	visibility: visible;
+	opacity: 1;
+	transform: translate(-50%, -50%) scale(1);
+}
+
+/* Masquer le curseur sur tous les éléments de la section Explore */
+.text-element:nth-child(2),
+.text-element:nth-child(2) * {
+	cursor: none !important;
+	-webkit-user-select: none !important;
+	user-select: none !important;
+}
+
+/* Désactiver les événements de pointeur sur les éléments de fond */
+.clouds,
+.cloud,
+.foreground-clouds,
+.cloud-foreground {
+	pointer-events: none;
+}
+
+/* Style du curseur avion */
+.custom-plane-cursor {
+	position: fixed;
+	width: 48px;
+	height: 48px;
+	pointer-events: none;
+	z-index: 9999;
+	background-image: url("https://raw.githubusercontent.com/mickaellherminez/img/main/codepen/plane.png");
+	background-size: contain;
+	background-repeat: no-repeat;
+	transform: translate(-50%, -50%);
+	transition: transform 0.1s ease;
+}
+
+/* S'assurer que tous les éléments dans la section Explore n'affichent pas de curseur */
+.text-element:nth-child(2) *,
+.text-element:nth-child(2) h1,
+.text-element:nth-child(2) .clouds,
+.text-element:nth-child(2) .cloud,
+.text-element:nth-child(2) .foreground-clouds,
+.text-element:nth-child(2) .cloud-foreground {
+	cursor: none !important;
+	-webkit-user-select: none !important;
+	user-select: none !important;
+}
+
+.text-element:nth-child(2) .clouds {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	z-index: 0;
+}
+
+.text-element:nth-child(2) .cloud {
+	position: absolute;
+	background: white;
+	border-radius: 50px;
+	opacity: 0.15;
+	filter: blur(3px);
+}
+
+.text-element:nth-child(2) h1 {
+	position: relative;
+	z-index: 2;
+	color: #1a237e;
+	/* Bleu foncé pour meilleure lisibilité */
+	font-weight: 800;
+	text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.8),
+		-2px -2px 0 rgba(255, 255, 255, 0.8), 2px -2px 0 rgba(255, 255, 255, 0.8),
+		-2px 2px 0 rgba(255, 255, 255, 0.8), 0 0 15px rgba(255, 255, 255, 0.5);
+	transition: all 0.4s ease;
+}
+
+/* Animation au survol */
+.text-element:nth-child(2):hover h1 {
+	transform: scale(1.05);
+	color: #3f51b5;
+	text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.9),
+		-2px -2px 0 rgba(255, 255, 255, 0.9), 2px -2px 0 rgba(255, 255, 255, 0.9),
+		-2px 2px 0 rgba(255, 255, 255, 0.9), 0 0 20px rgba(255, 255, 255, 0.7);
+}
+
+/* Effet de boussole au survol */
+.compass-indicator {
+	position: absolute;
+	width: 40px;
+	height: 40px;
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 0.3s ease;
+	z-index: 3;
+}
+
+.compass-indicator::before {
+	content: "↑";
+	position: absolute;
+	font-size: 24px;
+	color: #1a237e;
+	text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+	transform-origin: center;
+	animation: compassSpin 2s ease-out;
+}
+
+@keyframes compassSpin {
+	0% {
+		transform: rotate(0deg) scale(0);
+		opacity: 0;
+	}
+
+	50% {
+		transform: rotate(720deg) scale(1.2);
+		opacity: 1;
+	}
+
+	100% {
+		transform: rotate(1080deg) scale(1);
+		opacity: 0.8;
+	}
+}
+
+/* Animation des particules de traînée */
+.explore-particle {
+	position: absolute;
+	pointer-events: none;
+	background: transparent;
+	border: 2px solid #1a237e;
+	opacity: 0;
+	animation: exploreParticle 1.2s ease-out forwards;
+}
+
+@keyframes exploreParticle {
+	0% {
+		opacity: 0.8;
+		transform: scale(1) translateY(0);
+	}
+
+	100% {
+		opacity: 0;
+		transform: scale(0.3) translateY(-30px) rotate(var(--rotation));
+	}
+}
+
+/* Styles pour le troisième élément */
+.text-element:nth-child(3) {
+	position: relative;
+	overflow: hidden;
+	background: linear-gradient(135deg, #0a192f, #172a45);
+	cursor: none;
+}
+
+.dream-container {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.star-field {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	perspective: 1000px;
+}
+
+.star {
+	position: absolute;
+	width: 2px;
+	height: 2px;
+	background: #fff;
+	border-radius: 50%;
+	animation: starTwinkle var(--twinkle-duration, 3s) ease-in-out infinite,
+		starParallax var(--parallax-duration, 20s) linear infinite;
+	opacity: var(--star-opacity, 0.8);
+}
+
+.shooting-star {
+	position: absolute;
+	width: 100px;
+	height: 1px;
+	background: linear-gradient(90deg, #fff, transparent);
+	animation: shootingStar 3s linear infinite;
+	opacity: 0;
+}
+
+.dream-cursor {
+	position: fixed;
+	width: 40px;
+	height: 40px;
+	pointer-events: none;
+	z-index: 9999;
+	mix-blend-mode: difference;
+	transition: transform 0.2s ease;
+	background: radial-gradient(
+		circle,
+		rgba(255, 255, 255, 0.8) 0%,
+		rgba(255, 255, 255, 0) 70%
+	);
+	transform: translate(-50%, -50%) scale(var(--scale, 1));
+}
+
+.dream-cursor::after {
+	content: "";
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	background: radial-gradient(
+		circle,
+		rgba(100, 255, 218, 0.4) 0%,
+		rgba(100, 255, 218, 0) 70%
+	);
+	animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.dream-text {
+	position: relative;
+	z-index: 2;
+	text-align: center;
+	color: #fff;
+}
+
+.dream-text h1 {
+	font-size: clamp(3rem, 6vw, 5rem);
+	background: linear-gradient(45deg, #fff 10%, #64ffda 50%, #fff 90%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+	text-shadow: 0 0 30px rgba(100, 255, 218, 0.3);
+	animation: dreamGlow 3s ease-in-out infinite;
+}
+
+.dream-prompt {
+	position: absolute;
+	bottom: 20%;
+	left: 50%;
+	transform: translateX(-50%);
+	font-size: 1.2rem;
+	color: rgba(255, 255, 255, 0.8);
+	text-align: center;
+	opacity: 0;
+	transition: opacity 0.5s ease;
+}
+
+.text-element:nth-child(3):hover .dream-prompt {
+	opacity: 1;
+}
+
+@keyframes starTwinkle {
+	0%,
+	100% {
+		opacity: var(--star-opacity, 0.8);
+	}
+	50% {
+		opacity: 0.2;
+	}
+}
+
+@keyframes starParallax {
+	from {
+		transform: translateZ(0);
+	}
+	to {
+		transform: translateZ(200px);
+	}
+}
+
+@keyframes shootingStar {
+	0% {
+		transform: translateX(-100%) translateY(100%) rotate(-45deg);
+		opacity: 1;
+	}
+	20% {
+		opacity: 1;
+	}
+	100% {
+		transform: translateX(200%) translateY(-200%) rotate(-45deg);
+		opacity: 0;
+	}
+}
+
+@keyframes dreamGlow {
+	0%,
+	100% {
+		text-shadow: 0 0 30px rgba(100, 255, 218, 0.3);
+	}
+	50% {
+		text-shadow: 0 0 50px rgba(100, 255, 218, 0.5);
+	}
+}
+
+@keyframes pulseGlow {
+	0%,
+	100% {
+		transform: scale(1);
+		opacity: 0.4;
+	}
+	50% {
+		transform: scale(1.2);
+		opacity: 0.6;
+	}
+}
+
+/* Styles pour les confettis */
+.confetti-container {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 300px;
+	height: 300px;
+	pointer-events: none;
+	z-index: 5;
+}
+
+.confetti {
+	position: absolute;
+	width: 15px;
+	height: 15px;
+	opacity: 0;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	box-shadow: 0 0 15px rgba(255, 154, 158, 0.7);
+	z-index: 5;
+}
+
+.text-element:nth-child(3):hover .confetti {
+	animation: confettiBurst var(--duration, 1.5s) ease-out forwards;
+	animation-delay: var(--delay, 0s);
+}
+
+/* Animations existantes */
+@keyframes naturalFlight {
+	0% {
+		transform: translate(-120%, -100%) rotate(15deg) scale(0.8);
+	}
+
+	20% {
+		transform: translate(-60%, -20%) rotate(5deg) scale(0.9);
+	}
+
+	40% {
+		transform: translate(0%, 20%) rotate(-5deg) scale(1);
+	}
+
+	60% {
+		transform: translate(60%, -20%) rotate(5deg) scale(0.9);
+	}
+
+	80% {
+		transform: translate(120%, -100%) rotate(15deg) scale(0.8);
+	}
+
+	100% {
+		transform: translate(-120%, -100%) rotate(15deg) scale(0.8);
+	}
+}
+
+@keyframes confettiBurst {
+	0% {
+		opacity: 0;
+		transform: translate(-50%, -50%) scale(0) rotate(0deg);
+	}
+
+	15% {
+		opacity: 1;
+		transform: translate(-50%, -50%) scale(1.5) rotate(45deg);
+	}
+
+	35% {
+		opacity: 1;
+		transform: translate(var(--endX, 0px), var(--endY, 0px)) scale(1)
+			rotate(90deg);
+	}
+
+	100% {
+		opacity: 0;
+		transform: translate(
+				calc(var(--endX, 0px) * 1.5),
+				calc(var(--endY, 0px) * 1.5)
+			)
+			scale(0.3) rotate(180deg);
+	}
+}
+
+@keyframes gradientShift {
+	0% {
+		background-position: 0% 50%;
+	}
+
+	50% {
+		background-position: 100% 50%;
+	}
+
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
+@keyframes revealText {
+	0% {
+		-webkit-text-fill-color: transparent;
+		-webkit-background-clip: text;
+		opacity: 0.7;
+	}
+
+	50% {
+		-webkit-text-fill-color: rgba(106, 17, 203, 0.5);
+		-webkit-background-clip: text;
+		opacity: 0.85;
+	}
+
+	100% {
+		-webkit-text-fill-color: #ffffff;
+		-webkit-background-clip: text;
+		opacity: 1;
+		text-shadow: 0 0 15px rgba(106, 17, 203, 0.8);
+	}
+}
+
+/* Media queries améliorées */
+@media (min-width: 901px) {
+	.text-element h1 {
+		font-size: clamp(3rem, 6vw, 5rem);
+	}
+}
+
+@media (max-width: 900px) {
+	.art-container {
+		grid-template-columns: 1fr;
+	}
+
+	.text-element {
+		height: calc((100vh - 4rem) / 3);
+	}
+
+	.text-element h1 {
+		font-size: clamp(2.5rem, 5vw, 4rem);
+	}
+}
+
+@media (max-width: 480px) {
+	.text-element h1 {
+		font-size: clamp(2rem, 4vw, 3rem);
+	}
+}
+
+/* Désactivation des effets au survol pour les écrans tactiles */
+@media (hover: none) {
+	.text-element:hover {
+		transform: none;
+	}
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	height: 100vh;
+	background: linear-gradient(to bottom, #87ceeb, #e0f6ff);
+	overflow: hidden;
+}
+
+.clouds {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	z-index: 0;
+}
+
+.cloud {
+	position: absolute;
+	background: white;
+	border-radius: 50px;
+	opacity: 0.8;
+	filter: blur(3px);
+	opacity: 0.15;
+}
+
+.cloud::before,
+.cloud::after {
+	content: "";
+	position: absolute;
+	background: white;
+	border-radius: 50%;
+}
+
+.cloud1 {
+	width: 120px;
+	height: 40px;
+	top: 20%;
+	animation: moveCloud 25s linear infinite;
+}
+
+.cloud1::before {
+	width: 50px;
+	height: 50px;
+	top: -20px;
+	left: 15px;
+}
+
+.cloud1::after {
+	width: 40px;
+	height: 40px;
+	top: -15px;
+	left: 50px;
+}
+
+.cloud2 {
+	width: 100px;
+	height: 35px;
+	top: 40%;
+	animation: moveCloud 20s linear infinite;
+	animation-delay: -5s;
+}
+
+.cloud2::before {
+	width: 45px;
+	height: 45px;
+	top: -18px;
+	left: 12px;
+}
+
+.cloud2::after {
+	width: 35px;
+	height: 35px;
+	top: -13px;
+	left: 45px;
+}
+
+.cloud3 {
+	width: 150px;
+	height: 45px;
+	top: 60%;
+	animation: moveCloud 30s linear infinite;
+	animation-delay: -10s;
+}
+
+.cloud3::before {
+	width: 55px;
+	height: 55px;
+	top: -22px;
+	left: 18px;
+}
+
+.cloud3::after {
+	width: 45px;
+	height: 45px;
+	top: -17px;
+	left: 60px;
+}
+
+.cloud4 {
+	width: 130px;
+	height: 42px;
+	top: 80%;
+	animation: moveCloud 22s linear infinite;
+	animation-delay: -15s;
+}
+
+.cloud4::before {
+	width: 52px;
+	height: 52px;
+	top: -21px;
+	left: 16px;
+}
+
+.cloud4::after {
+	width: 42px;
+	height: 42px;
+	top: -16px;
+	left: 55px;
+}
+
+@keyframes moveCloud {
+	from {
+		left: -200px;
+	}
+
+	to {
+		left: 100%;
+	}
+}
+
+/* Animation d'apparition au chargement */
+@keyframes fadeInScale {
+	from {
+		opacity: 0;
+		transform: scale(0.9);
+	}
+
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+.text-element {
+	animation: fadeInScale 0.8s ease-out forwards;
+	animation-delay: calc(var(--order) * 0.2s);
+}
+
+/* Style des particules créatives */
+.creative-particle {
+	position: absolute;
+	pointer-events: none;
+	mix-blend-mode: screen;
+	animation: particleAnimation 1s ease-out forwards;
+	background: transparent;
+	border: 2px solid;
+	transform-origin: center;
+	opacity: 0.8;
+}
+
+@keyframes particleAnimation {
+	0% {
+		opacity: 1;
+		transform: scale(1) rotate(0deg);
+	}
+
+	100% {
+		opacity: 0;
+		transform: scale(0) rotate(180deg) translate(var(--moveX), var(--moveY));
+	}
+}
+
+/* Style des formes géométriques en arrière-plan */
+.geometric-background {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 0;
+	overflow: hidden;
+}
+
+.floating-shape {
+	position: absolute;
+	opacity: 0;
+	background: transparent;
+	border: 2.5px solid;
+	mix-blend-mode: lighten;
+	box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+/* Animations variées pour les formes */
+.floating-shape.rotate {
+	animation: rotateFloat 12s linear infinite;
+}
+
+.floating-shape.pulse {
+	animation: pulseFloat 8s ease-in-out infinite;
+}
+
+.floating-shape.wave {
+	animation: waveFloat 10s ease-in-out infinite;
+}
+
+@keyframes rotateFloat {
+	0% {
+		opacity: 0;
+		transform: rotate(0deg) scale(0);
+	}
+
+	10% {
+		opacity: 0.5;
+		transform: rotate(180deg) scale(1);
+	}
+
+	90% {
+		opacity: 0.5;
+		transform: rotate(720deg) scale(1);
+	}
+
+	100% {
+		opacity: 0;
+		transform: rotate(900deg) scale(0);
+	}
+}
+
+@keyframes pulseFloat {
+	0% {
+		opacity: 0;
+		transform: scale(0) translate(0, 0);
+	}
+
+	25% {
+		opacity: 0.5;
+		transform: scale(1.2) translate(50px, -50px);
+	}
+
+	75% {
+		opacity: 0.5;
+		transform: scale(0.8) translate(-50px, 50px);
+	}
+
+	100% {
+		opacity: 0;
+		transform: scale(0) translate(0, 0);
+	}
+}
+
+@keyframes waveFloat {
+	0% {
+		opacity: 0;
+		transform: translateY(0) scale(0) rotate(0deg);
+	}
+
+	25% {
+		opacity: 0.5;
+		transform: translateY(-100px) scale(1) rotate(90deg);
+	}
+
+	75% {
+		opacity: 0.5;
+		transform: translateY(100px) scale(1) rotate(270deg);
+	}
+
+	100% {
+		opacity: 0;
+		transform: translateY(0) scale(0) rotate(360deg);
+	}
+}
+
+/* Ajustement spécifique pour les triangles */
+.floating-shape.triangle {
+	background: transparent;
+	position: relative;
+	clip-path: none;
+	/* On supprime le clip-path précédent */
+}
+
+.floating-shape.triangle::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+	border: inherit;
+	border-color: inherit;
+	box-shadow: inherit;
+}
+
+/* Nouveaux styles pour les nuages du premier plan */
+.foreground-clouds {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	z-index: 2;
+}
+
+.cloud-foreground {
+	position: absolute;
+	background: white;
+	border-radius: 50px;
+	opacity: 0.7;
+	filter: blur(0);
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.cloud-foreground::before,
+.cloud-foreground::after {
+	content: "";
+	position: absolute;
+	background: inherit;
+	border-radius: 50%;
+}
+
+/* Styles spécifiques pour chaque nuage du premier plan */
+.cloud-front-1 {
+	width: 100px;
+	height: 30px;
+	animation: moveCloudFront 35s linear infinite;
+}
+
+.cloud-front-1::before {
+	width: 45px;
+	height: 45px;
+	top: -20px;
+	left: 10px;
+}
+
+.cloud-front-1::after {
+	width: 35px;
+	height: 35px;
+	top: -15px;
+	left: 40px;
+}
+
+.cloud-front-2 {
+	width: 140px;
+	height: 40px;
+	animation: moveCloudFront 45s linear infinite;
+	animation-delay: -15s;
+}
+
+.cloud-front-2::before {
+	width: 55px;
+	height: 55px;
+	top: -25px;
+	left: 15px;
+}
+
+.cloud-front-2::after {
+	width: 45px;
+	height: 45px;
+	top: -20px;
+	left: 50px;
+}
+
+.cloud-front-3 {
+	width: 80px;
+	height: 25px;
+	animation: moveCloudFront 30s linear infinite;
+	animation-delay: -7s;
+}
+
+.cloud-front-3::before {
+	width: 35px;
+	height: 35px;
+	top: -15px;
+	left: 8px;
+}
+
+.cloud-front-3::after {
+	width: 25px;
+	height: 25px;
+	top: -10px;
+	left: 35px;
+}
+
+@keyframes moveCloudFront {
+	from {
+		transform: translateX(-100%);
+	}
+
+	to {
+		transform: translateX(calc(100vw + 100%));
+	}
+}
+
+/* Effet de traînée du curseur */
+.explore-trail {
+	position: absolute;
+	pointer-events: none;
+	mix-blend-mode: screen;
+	z-index: 1;
+}
+
+.trail-particle {
+	position: absolute;
+	background: transparent;
+	border: 2px solid;
+	opacity: 0;
+	animation: trailFade 1.5s ease-out forwards;
+}
+
+@keyframes trailFade {
+	0% {
+		opacity: 0.8;
+		transform: scale(1) rotate(0deg);
+	}
+
+	100% {
+		opacity: 0;
+		transform: scale(0.3) rotate(180deg) translateY(-20px);
+	}
+}
+
+/* Style pour la section Explore et tous ses éléments enfants */
+.text-element:nth-child(2),
+.text-element:nth-child(2) *,
+.text-element:nth-child(2) .clouds,
+.text-element:nth-child(2) .cloud,
+.text-element:nth-child(2) h1,
+.text-element:nth-child(2) .foreground-clouds,
+.text-element:nth-child(2) .cloud-foreground {
+	cursor: none !important;
+	-webkit-user-select: none !important;
+	user-select: none !important;
+}
+
+/* Style du curseur avion */
+.custom-plane-cursor {
+	position: fixed;
+	width: 48px;
+	height: 48px;
+	pointer-events: none;
+	z-index: 9999;
+	background-image: url("https://raw.githubusercontent.com/mickaellherminez/img/main/codepen/plane.png");
+	background-size: contain;
+	background-repeat: no-repeat;
+	transform: translate(-50%, -50%);
+	transition: transform 0.1s ease;
+}
+
+/* Styles pour les bordures entre les sections */
+.section-border {
+	position: absolute;
+	width: 2px;
+	height: 100%;
+	background: rgba(255, 255, 255, 0.1);
+	z-index: 10;
+	transition: all 0.3s ease;
+}
+
+.section-border::before {
+	content: "";
+	position: absolute;
+	width: 20px;
+	height: 20px;
+	background: radial-gradient(
+		circle,
+		rgba(255, 255, 255, 0.3) 0%,
+		transparent 70%
+	);
+	border-radius: 50%;
+	transform: translateX(-50%);
+	opacity: 0;
+	transition: all 0.2s ease;
+	pointer-events: none;
+}
+
+.border-1-2 {
+	left: 33.33%;
+}
+
+.border-2-3 {
+	left: 66.66%;
+}
+
+.border-pierce {
+	animation: pierceBorder 0.4s ease-out;
+}
+
+@keyframes pierceBorder {
+	0% {
+		box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+		background: rgba(255, 255, 255, 0.1);
+	}
+	50% {
+		box-shadow: 0 0 15px rgba(255, 255, 255, 0.6),
+			0 0 30px rgba(255, 255, 255, 0.4);
+		background: rgba(255, 255, 255, 0.8);
+	}
+	100% {
+		box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+		background: rgba(255, 255, 255, 0.1);
+	}
+}
