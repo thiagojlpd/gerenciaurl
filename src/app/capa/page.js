@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Card } from 'primereact/card';
-import SolarSystem from '../solar/page';
+import SolarSystem from '../componentes/solar/Solar';
+import { motion } from 'framer-motion';
 
 import { Menubar } from 'primereact/menubar';
 import { useRouter } from 'next/navigation';
@@ -41,7 +42,7 @@ export default function HomePage() {
         <div className="app-container">
             <Menubar model={[{ label: 'URL', icon: 'pi pi-sync', command: handleAHomeNavigation }, { label: 'DNS', icon: 'pi pi-share-alt', command: handleADnsNavigation }, { label: 'Sobre', icon: 'pi pi-info-circle', command: handleAboutNavigation }, { label: 'Capa', icon: 'pi pi-info-circle', command: handleCapaNavigation }]} className="menu-bar" />
             <p />
-            <SolarSystem />           
+            <SolarSystem />
         </div>
     );
 }

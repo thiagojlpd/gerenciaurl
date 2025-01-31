@@ -1,5 +1,6 @@
 'use client'; // Indica que este código deve ser executado no lado do cliente, não no servidor
 
+import { motion } from 'framer-motion';
 import { Card } from 'primereact/card';
 import { Menubar } from 'primereact/menubar';
 import { useRouter } from 'next/navigation';
@@ -35,7 +36,7 @@ export default function HomePage() {
             <Menubar model={[{ label: 'URL', icon: 'pi pi-sync', command: handleAHomeNavigation }, { label: 'DNS', icon: 'pi pi-share-alt', command: handleADnsNavigation }, { label: 'Sobre', icon: 'pi pi-info-circle', command: handleAboutNavigation }, { label: 'Capa', icon: 'pi pi-info-circle', command: handleCapaNavigation }]} className="menu-bar" />
             <p />
             <Card title="Sobre o gerenciamento de URL e análise de DNS" className="p-mt-4 card-transparent">
-                <div class="container">
+                <div className="container">
                     <header>
                         <h2>Segurança da Informação e Gerenciamento de Configuração de TI: Análise dos Arquivos de Zona do DNS</h2>
                     </header>
@@ -51,8 +52,8 @@ export default function HomePage() {
                         <p>Além disso, é necessário avaliar as respostas das requisições HTTP/HTTPS. O código de status 200 (OK) deve ser retornado quando o servidor e a aplicação estão funcionando corretamente. Caso o código de resposta seja diferente, como 4xx (erro do cliente) ou 5xx (erro do servidor), pode ser um indicativo de falhas de configuração ou problemas de comunicação entre o cliente e o servidor.</p>
 
                         <h3>Importância da Avaliação de Segurança no DNS:</h3>
-                        <p>A análise das configurações DNS também deve considerar aspectos críticos de segurança. Uma dessas abordagens é a avaliação do uso de <span class="important">DNSSEC</span> (Domain Name System Security Extensions), que visa proteger o processo de resolução de nomes contra ataques, como o envenenamento de cache DNS. Ao validar a autenticidade das respostas DNS, o DNSSEC aumenta a confiança no processo de resolução de nomes e evita que as informações sejam manipuladas.</p>
-                        <p>Outro ponto importante é o uso de portas aleatórias no protocolo TCP para grandes consultas DNS, que ajuda a evitar ataques de spoofing e cache poisoning. Além disso, a análise do suporte a protocolos modernos como <span class="important">DoH</span> (DNS over HTTPS) e <span class="important">DoT</span> (DNS over TLS) pode contribuir para uma camada extra de segurança, pois esses protocolos criptografam a comunicação DNS, dificultando a interceptação ou modificação das resoluções DNS.</p>
+                        <p>A análise das configurações DNS também deve considerar aspectos críticos de segurança. Uma dessas abordagens é a avaliação do uso de <span className="important">DNSSEC</span> (Domain Name System Security Extensions), que visa proteger o processo de resolução de nomes contra ataques, como o envenenamento de cache DNS. Ao validar a autenticidade das respostas DNS, o DNSSEC aumenta a confiança no processo de resolução de nomes e evita que as informações sejam manipuladas.</p>
+                        <p>Outro ponto importante é o uso de portas aleatórias no protocolo TCP para grandes consultas DNS, que ajuda a evitar ataques de spoofing e cache poisoning. Além disso, a análise do suporte a protocolos modernos como <span className="important">DoH</span> (DNS over HTTPS) e <span className="important">DoT</span> (DNS over TLS) pode contribuir para uma camada extra de segurança, pois esses protocolos criptografam a comunicação DNS, dificultando a interceptação ou modificação das resoluções DNS.</p>
 
                         <h3>Blacklists e Segurança de Resolução DNS</h3>
                         <p>Por fim, é fundamental realizar uma verificação do status do servidor DNS utilizado, garantindo que ele não esteja listado em blacklists de DNS, o que pode indicar atividades maliciosas ou comprometimento. A presença do servidor em uma blacklist pode afetar a confiabilidade da rede e a segurança das resoluções de nomes, além de prejudicar a reputação da organização.</p>
