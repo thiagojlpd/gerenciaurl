@@ -1,0 +1,39 @@
+import dns from 'dns/promises';
+
+async function verificarIPListaNegra(ip, listaNegraDominios) {
+  try {
+    for (const dominio of listaNegraDominios) {
+      const ipReverso = ip.split('.').reverse().join('.');
+      const consulta = `${ipReverso}.${dominio}`;
+
+      try {
+        const resultado = await dns.resolve(consulta, 'A');
+        if (resultado) {
+          return { ip, listado: true, listaNegra: dominio };
+        }
+      } catch {
+        // IP não listado neste domínio, continuar
+      }
+    }
+    return { ip, listado: false };
+  } catch (error) {
+    return { ip, error: error.message };
+  }
+}
+
+export async function verificarListaNegra(servidoresDNS) {
+  const listasNegras = [
+    'zen.spamhaus.org',
+    'bl.spamcop.net',
+    'b.barracudacentral.org',
+    // Adicione mais listas aqui conforme necessário
+  ];
+
+  const resultados = [];
+  for (const servidor of servidoresDNS) {
+    const resultado = await verificarIPListaNegra(servidor, listasNegras);
+    resultados.push(resultado);
+  }
+
+  return resultados;
+}

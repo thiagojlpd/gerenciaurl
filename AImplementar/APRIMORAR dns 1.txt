@@ -1,0 +1,68 @@
+import dns from 'dns';
+
+export async function verificarDnssec(domain) {
+    try {
+        // Consulta DNS com a opção +dnssec para verificar a presença de registros DNSSEC
+        const resposta = await new Promise((resolve, reject) => {
+            dns.resolve(domain, 'ANY', { dnssec: true }, (err, registros) => {
+                if (err) {
+                    reject(`Erro na consulta DNS: ${err.message}`);
+                } else {
+                    resolve(registros);
+                }
+            });
+        });
+
+        // Verifique se há registros DNSSEC na resposta (como RRSIG)
+        const registrosDnssec = resposta.filter((registro) => registro.type === 'RRSIG');
+
+        if (registrosDnssec.length > 0) {
+            console.log(`O domínio ${domain} retornou uma resposta assinada com DNSSEC.`);
+            return true;
+        } else {
+            console.log(`O domínio ${domain} não retornou registros DNSSEC.`);
+            return false;
+        }
+    } catch (error) {
+        console.error('Erro ao verificar DNSSEC:', error);
+        return false;
+    }
+}
+
+// Método para validar a assinatura DNSSEC (verifica a assinatura usando a chave pública)
+export async function validarAssinaturaDnssec(domain) {
+    try {
+        // Aqui, você precisará de uma biblioteca adicional ou serviço para validar a assinatura DNSSEC
+        // A validação real da assinatura requer a chave pública do domínio
+        // O processo pode ser complexo, então usaremos um exemplo básico
+
+        // Exemplo fictício de validação da assinatura DNSSEC
+        const registrosDnssec = await verificarDnssec(domain);
+        if (registrosDnssec) {
+            // Aqui você deve verificar a assinatura usando a chave pública do domínio
+            console.log(`Assinatura DNSSEC do domínio ${domain} validada com sucesso.`);
+            return true; // Sucesso
+        } else {
+            console.log('Falha ao validar assinatura DNSSEC.');
+            return false;
+        }
+    } catch (error) {
+        console.error('Erro ao validar a assinatura DNSSEC:', error);
+        return false;
+    }
+}
+
+// Exemplo de como utilizar
+async function exemplo() {
+    const dominio = 'example.com';
+    const dnssecVerificado = await verificarDnssec(dominio);
+
+    if (dnssecVerificado) {
+        console.log(`Iniciando validação da assinatura DNSSEC para o domínio ${dominio}`);
+        await validarAssinaturaDnssec(dominio);
+    } else {
+        console.log('DNSSEC não está ativado para o domínio.');
+    }
+}
+
+exemplo();

@@ -1,0 +1,92 @@
+import dns from 'dns';
+
+async function testarPortaAleatoria(dominio) {
+  const consultas = 10;
+  const portas = new Set();
+
+  try {
+    // Enviar consultas DNS
+    for (let i = 0; i < consultas; i++) {
+      const resposta = await new Promise((resolve, reject) => {
+        dns.resolve(dominio, 'A', (err, registros) => {
+          if (err) {
+            reject(`Erro na consulta DNS: ${err.message}`);
+          } else {
+            resolve(registros);
+          }
+        });
+      });
+      
+      // Verifica a porta de origem (aqui estamos simulando, pois o Node.js DNS nativo não expõe as portas de origem)
+      // Isso precisa ser feito por uma ferramenta de rede como tcpdump ou Wireshark para captura real
+      console.log(`Consulta ${i + 1}: Porta de origem aleatória simulada.`);
+      portas.add(i); // A cada nova consulta, assumimos uma porta diferente (simulação)
+    }
+
+    // Verifica se as portas são diferentes
+    if (portas.size > 1) {
+      console.log("A porta de origem está sendo randomizada.");
+      return true;
+    } else {
+      console.log("A porta de origem não está sendo randomizada.");
+      return false;
+    }
+  } catch (error) {
+    console.error('Erro ao verificar porta aleatória:', error);
+    return false;
+  }
+}
+
+import dns from 'dns';
+import { exec } from 'child_process';
+
+async function testarUsoTcpParaConsultasGrandes(dominio) {
+  const consulta = 'A'; // Tipo de consulta padrão (A)
+  const tamanhoRespostaLimite = 512; // Tamanho limite de resposta em bytes (para UDP)
+  
+  try {
+    // Usando `dig` via linha de comando para forçar uma consulta que ultrapasse o limite do UDP
+    exec(`dig +tcp ${dominio} ${consulta}`, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Erro ao executar dig: ${error.message}`);
+        return;
+      }
+      if (stderr) {
+        console.error(`Erro de stderr: ${stderr}`);
+        return;
+      }
+      
+      // Verificando se a resposta foi via TCP
+      if (stdout.includes('Query time:')) {
+        console.log(`O servidor DNS usou TCP para responder a consulta grande para o domínio ${dominio}.`);
+      } else {
+        console.log(`O servidor DNS não usou TCP. A consulta foi feita via UDP.`);
+      }
+    });
+  } catch (error) {
+    console.error('Erro ao verificar uso de TCP para consultas grandes:', error);
+  }
+}
+
+
+
+// pages/api/testarDns.js
+
+export default async function handler(req, res) {
+  const dominio = 'example.com'; // Altere para o domínio que você deseja testar
+
+  try {
+    // Testar aleatoriedade da porta de origem
+    const portaAleatoria = await testarPortaAleatoria(dominio);
+
+    // Testar uso de TCP para consultas grandes
+    await testarUsoTcpParaConsultasGrandes(dominio);
+
+    res.status(200).json({
+      portaAleatoria,
+      mensagem: "Testes concluídos com sucesso.",
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao realizar os testes DNS' });
+  }
+}

@@ -17,6 +17,7 @@ import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import './globals.css';
 
+
 // Função principal da página
 export default function HomePage() {
   // Definição dos estados para o controle dos dados e interações
@@ -58,7 +59,7 @@ export default function HomePage() {
   const handleCapaNavigation = () => {
     router.push('/capa'); // Navega para a página "/sobre"
   };
-  
+
   // Função para buscar as entradas do servidor
   const fetchEntries = async () => {
     try {
@@ -109,9 +110,6 @@ export default function HomePage() {
       alert('Erro ao salvar a entrada.');
     }
   };
-
-
-
 
   // Função para extrair o domínio base de um arquivo de zona DNS
   const extractBaseDomain = (lines) => {
@@ -257,7 +255,7 @@ export default function HomePage() {
   // Função para filtrar as entradas com base nos critérios definidos
   const filteredEntries = entries.filter((entry) => {
     const url = entry.url?.toLowerCase() || '';
-    const ip = entry.resolvedIp?.toLowerCase() || ''; // Alterado de `entry.ip` para `entry.resolvedIp`
+    const ip = entry.resolvedIp?.toLowerCase() || '';
 
     const matchesSearchTerm =
       url.includes(searchTerm.toLowerCase()) || ip.includes(searchTerm.toLowerCase());
@@ -300,7 +298,8 @@ export default function HomePage() {
   // Renderiza a interface de usuário
   return (
     <div className="app-container">
-      <Menubar model={[{ label: 'URL', icon: 'pi pi-sync', command: handleAHomeNavigation }, { label: 'DNS', icon: 'pi pi-share-alt', command: handleADnsNavigation }, { label: 'Sobre', icon: 'pi pi-info-circle', command: handleAboutNavigation }, { label: 'Capa', icon: 'pi pi-info-circle', command: handleCapaNavigation }]} className="menu-bar" />
+      {/*<Menubar model={[{ label: 'URL', icon: 'pi pi-sync', command: handleAHomeNavigation }, { label: 'DNS', icon: 'pi pi-share-alt', command: handleADnsNavigation }, { label: 'Sobre', icon: 'pi pi-info-circle', command: handleAboutNavigation }, { label: 'Capa', icon: 'pi pi-info-circle', command: handleCapaNavigation }]} className="menu-bar" />*/}
+      <Menubar model={[{ label: 'URL', icon: 'pi pi-sync', command: handleAHomeNavigation }, { label: 'Sobre', icon: 'pi pi-info-circle', command: handleAboutNavigation }, { label: 'Capa', icon: 'pi pi-info-circle', command: handleCapaNavigation }]} className="menu-bar" />
       <br />
       <div className="p-4">
         <Card title="Gerenciamento de URLs" className="card-transparent">
@@ -355,8 +354,8 @@ export default function HomePage() {
               header="DNS usado"
               body={(rowData) => (
                 <Badge
-                  value={rowData.nslookup?.serverAddress || "Não disponível"} // Garantia de acesso seguro
-                  className="p-badge-light" // Corrigido para uma string válida
+                  value={rowData.nslookup?.serverAddress || "Não disponível"}
+                  className="p-badge-light"
                 />
               )}
               sortable

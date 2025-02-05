@@ -1,0 +1,49 @@
+import https from 'https';
+import tls from 'tls';
+
+async function verificarSuporteDoH(serverUrl) {
+  return new Promise((resolve) => {
+    const options = {
+      hostname: serverUrl,
+      port: 443,
+      path: '/dns-query',
+      method: 'GET',
+      headers: {
+        'Accept': 'application/dns-message', // Header específico para consultas DoH
+      },
+    };
+
+    const req = https.request(options, (res) => {
+      if (res.statusCode === 200) {
+        resolve({ doh: true });
+      } else {
+        resolve({ doh: false });
+      }
+    });
+
+    req.on('error', () => resolve({ doh: false }));
+    req.end();
+  });
+}
+
+async function verificarSuporteDoT(serverUrl) {
+  return new Promise((resolve) => {
+    const socket = tls.connect(853, serverUrl, { rejectUnauthorized: false }, () => {
+      if (socket.authorized) {
+        resolve({ dot: true });
+      } else {
+        resolve({ dot: false });
+      }
+      socket.end();
+    });
+
+    socket.on('error', () => resolve({ dot: false }));
+  });
+}
+
+export async function verificarSuporteDoHDoT(serverUrl) {
+  const doh = await verificarSuporteDoH(serverUrl);
+  const dot = await verificarSuporteDoT(serverUrl);
+  return { ...doh, ...dot };
+}
+
